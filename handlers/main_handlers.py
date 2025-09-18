@@ -56,6 +56,11 @@ async def support(message:Message, state:FSMContext):
     await state.set_state(Support.report_text)
 
 
+@ro.message(Command("get_chat_id"))
+async def get_chat_id(message:Message):
+  await message.answer(message.from_user.chat.id)
+
+
 @ro.callback_query(lambda c: c.data == "get_vless")
 async def get_vless(callback: CallbackQuery):
     await callback.message.edit_text(f"ваша ссылка на vless (скопируйте её и вставте в hiddify)\n<pre>{VPN_SUBSCRIPTION_ADRESS}/{storage.get_user(callback.message.chat.id).subID}</pre>")

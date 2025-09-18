@@ -58,7 +58,7 @@ async def support(message:Message, state:FSMContext):
 
 @ro.message(Command("get_chat_id"))
 async def get_chat_id(message:Message):
-  await message.answer(message.from_user.chat.id)
+  await message.answer(message.chat.id)
 
 
 @ro.callback_query(lambda c: c.data == "get_vless")

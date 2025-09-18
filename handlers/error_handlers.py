@@ -1,6 +1,6 @@
 from aiogram import Router, Bot
 from aiogram.types import ErrorEvent
-from config import ADMIN_CHAT_ID
+from config import INFO_CHAT_ID
 import traceback
 import logging
 
@@ -43,7 +43,7 @@ async def error_handler(event: ErrorEvent, bot:Bot):
     
     try:
         await bot.send_message(
-            chat_id=ADMIN_CHAT_ID,
+            chat_id=INFO_CHAT_ID,
             text=error_message,
             parse_mode="HTML"
         )

@@ -3,6 +3,7 @@ import decimal
 import storage
 import json
 import uuid
+from pinguins import info
 from yoomoney import Quickpay
 from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
@@ -10,15 +11,16 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.types import (Message, CallbackQuery, 
                            InlineKeyboardMarkup, InlineKeyboardButton)
-from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, ADMIN_CHAT_ID
+from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, INFO_CHAT_ID
 
 
 ro = Router(name=__name__)
 start_message="Используйте команду /menu"
 menu_text="it,s menu text"
 
-menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="мой профиль vless", callback_data="get_vless")],
-                                                      [InlineKeyboardButton(text="продлить", callback_data="pay")]])
+menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="мой профиль", callback_data="get_vless")],
+                                                      [InlineKeyboardButton(text="тарифы", callback_data="pay")],
+                                                      [InlineKeyboardButton(text="кто такие пингвины", callback_data="pinguins")]])
 back_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu")]])
 pay_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Продлить на 1 месяц (120 руб.)", callback_data="extend1")],
                                                      [InlineKeyboardButton(text="Продлить на 2 месяц (220 руб.)", callback_data="extend2")],
@@ -107,8 +109,14 @@ async def extend(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=quickpay.redirected_url)]]))
 
 
+@ro.callback_query(lambda c: c.data == "pinguins")
+async def pinguins(callback:CallbackQuery):
+    await callback.message.edit_text(info)
+    await callback.message.edit_reply_markup(reply_markup=back_keyboard)
+
+
 @ro.message(Support.report_text)
 async def report(message:Message, state:FSMContext):
-    await message.bot.send_message(ADMIN_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\n{message.text}")
+    await message.bot.send_message(INFO_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\n{message.text}")
     await state.clear()
     await message.answer("сообщение успешно отправлено поддержке")

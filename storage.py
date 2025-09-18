@@ -84,6 +84,14 @@ async def extend_user(chat_id:int, mounths:int):
     await xui_api.client.update_vless_user(user)
 
 
+async def update_vless_users():
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+    print(users)
+    for i in users:
+        await xui_api.client.update_vless_user(User(i[1], i[2], [3], i[4], i[5]))
+
+
 def get_operations_history():
     cursor.execute("SELECT operation_id, label FROM payment_history")
     return cursor.fetchall()

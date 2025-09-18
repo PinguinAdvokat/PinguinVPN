@@ -104,6 +104,6 @@ async def extend(callback: CallbackQuery):
 
 @ro.message(Support.report_text)
 async def report(message:Message, state:FSMContext):
-    await message.bot.send_message(ADMIN_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\nmessage.text")
+    await message.bot.send_message(ADMIN_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\n{message.text}")
     await state.clear()
     await message.answer("сообщение успешно отправлено поддержке")

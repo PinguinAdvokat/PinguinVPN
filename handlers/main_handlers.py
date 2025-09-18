@@ -36,7 +36,7 @@ async def start(message:Message):
     username = message.from_user.username
     if username == "":
         username = str(uuid.uuid1())
-    user = storage.User(message.chat.id, username)
+    user = storage.User(message.chat.id, username, subID=str(uuid.uuid1()), client_id=str(uuid.uuid1()))
     ok = await storage.add_user(user)
     if ok:
         await message.answer(f"вы были успешно зарегистрированы\n{start_message}")

@@ -46,17 +46,10 @@ async def send(message:Message, state:FSMContext):
         await state.set_state(Spam.users)
 
 
-@admin_r.message(Command("update"))
-async def update(message:Message):
-    if message.chat.id in ADMIN_CHAT_IDS:
-        await storage.update_vless_users()
-        await message.answer("все пользователи обновлены")
-
-
 @admin_r.message(Command("admin"))
 async def admin_panel(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        await message.answer("продлить пользователя на 1 месяц /extend_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send\nобновить клиентов 3x-ui относительно БД /update")
+        await message.answer("продлить пользователя на 1 месяц /extend_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send")
 
 
 @admin_r.message(Spam.users)

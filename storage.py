@@ -16,7 +16,7 @@ connection = psycopg2.connect(
 cursor = connection.cursor()
 
 class User():
-    def __init__(self, chat_id:int, username:str, subID:str=str(uuid.uuid1()), client_id:str=str(uuid.uuid1()), expire:int=None):
+    def __init__(self, chat_id:int, username:str, subID:str, client_id:str, expire:int=None):
         if not expire:
             date = datetime.datetime.now().timestamp() - 86400
             self.expire = int(date)
@@ -42,6 +42,7 @@ async def add_user(user:User):
     try:
         cursor.execute("INSERT INTO users (chat_id, username, subID, client_id, expire) VALUES (%s, %s, %s, %s, %s)", (user.chat_id, user.username, user.subID, user.client_id, user.expire))
     except psycopg2.errors.UniqueViolation as ex:
+        print(ex)
         connection.commit()
         return False
     if await xui_api.client.add_vless_user(user):
@@ -82,14 +83,6 @@ async def extend_user(chat_id:int, mounths:int):
         user.expire += 2629743 * mounths
     update_user(user)
     await xui_api.client.update_vless_user(user)
-
-
-async def update_vless_users():
-    cursor.execute("SELECT * FROM users")
-    users = cursor.fetchall()
-    print(users)
-    for i in users:
-        await xui_api.client.update_vless_user(User(i[1], i[2], [3], i[4], i[5]))
 
 
 def get_operations_history():

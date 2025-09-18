@@ -17,7 +17,6 @@ bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTM
 
 
 async def payment_loop():
-    await storage.update_vless_users()
     while True:
         await payment.update_clients(bot)
         await asyncio.sleep(30)

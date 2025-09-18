@@ -18,7 +18,7 @@ bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTM
 async def payment_loop():
     while True:
         print("update")
-        await payment.update_clients()
+        await payment.update_clients(bot)
         await asyncio.sleep(30)
 
 

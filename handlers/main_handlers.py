@@ -5,14 +5,16 @@ import json
 import uuid
 from yoomoney import Quickpay
 from aiogram import Router, F
-from aiogram.filters import Command, CommandStart
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.types import (Message, CallbackQuery, 
                            InlineKeyboardMarkup, InlineKeyboardButton)
-from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER
+from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, ADMIN_CHAT_ID
 
 
 ro = Router(name=__name__)
-start_message="start message. Use /menu"
+start_message="Используйте команду /menu"
 menu_text="it,s menu text"
 
 menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="мой профиль vless", callback_data="get_vless")],
@@ -20,7 +22,11 @@ menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text
 back_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu")]])
 pay_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Продлить на 1 месяц (120 руб.)", callback_data="extend1")],
                                                      [InlineKeyboardButton(text="Продлить на 2 месяц (220 руб.)", callback_data="extend2")],
-                                                     [InlineKeyboardButton(text="Продлить на 3 месяц (330 руб.)", callback_data="extend3")]])
+                                                     [InlineKeyboardButton(text="Продлить на 3 месяц (330 руб.)", callback_data="extend3")],
+                                                     [InlineKeyboardButton(text="Назад", callback_data="menu")]])
+
+class Support(StatesGroup):
+    report_text = State()
 
 
 @ro.message(CommandStart())
@@ -42,6 +48,12 @@ async def menu(message:Message):
         await message.answer(f"{menu_text}", reply_markup=menu_keyboard)
     else:
         await message.answer("используйте команду /start")
+
+
+@ro.message(Command("support"))
+async def support(message:Message, state:FSMContext):
+    await message.answer("Опишите вашу проблему в одном сообщении")
+    await state.set_state(Support.report_text)
 
 
 @ro.callback_query(lambda c: c.data == "get_vless")
@@ -66,7 +78,7 @@ async def pay(callback: CallbackQuery):
 async def extend(callback: CallbackQuery):
     mounts = callback.data[6:]
     if mounts == "1":
-        sum = 10
+        sum = 5
     elif mounts == "2":
         sum = 220
     elif mounts == "3":
@@ -88,3 +100,10 @@ async def extend(callback: CallbackQuery):
     )
     await callback.message.edit_text(f"Продление на {mounts} месяц за {sum} рублей.\nСсылка для оплаты:")
     await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=quickpay.redirected_url)]]))
+
+
+@ro.message(Support.report_text)
+async def report(message:Message, state:FSMContext):
+    await message.bot.send_message(ADMIN_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\nmessage.text")
+    await state.clear()
+    await message.answer("сообщение успешно отправлено поддержке")

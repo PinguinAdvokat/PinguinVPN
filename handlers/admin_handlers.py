@@ -23,9 +23,13 @@ async def users(message: Message):
 @admin_r.message(Command("extend_user"))
 async def extend_user(message: Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        user = storage.get_user_by_username(message.from_user.username)
-        await storage.extend_user(user.chat_id, 1)
-        await message.answer("пользователь продлён на месяц")
+        print(message.text[13:])
+        user = storage.get_user_by_username(message.text[13:])
+        if user:
+            await storage.extend_user(user.chat_id, 1)
+            await message.answer("пользователь продлён на месяц")
+        else:
+            await message.answer("пользователь не найден")
         
 
 @admin_r.message(Command("spam"))
@@ -49,7 +53,16 @@ async def send(message:Message, state:FSMContext):
 @admin_r.message(Command("admin"))
 async def admin_panel(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        await message.answer("продлить пользователя на 1 месяц /extend_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send")
+        await message.answer("продлить пользователя на 1 месяц /extend_user username\nпоставить дату окончания на вчера /reset_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send")
+
+
+@admin_r.message(Command("reset_user"))
+async def reset_user(message:Message):
+    if message.chat.id in ADMIN_CHAT_IDS:
+        if await storage.reset_user(message.text[12:]):
+            await message.answer("успешно сброшен")
+        else:
+            await message.answer("пользователь не найден")
 
 
 @admin_r.message(Spam.users)

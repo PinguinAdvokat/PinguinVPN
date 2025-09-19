@@ -75,6 +75,8 @@ def update_user(user:User):
 
 async def extend_user(chat_id:int, mounths:int):
     user = get_user(chat_id)
+    if not user:
+        return
     if user.expire < int(datetime.datetime.now().timestamp()):
         #продление на n мясяц с сегодняшнего дня
         user.expire = int(datetime.datetime.now().timestamp()) + (2629743 * mounths)
@@ -93,6 +95,15 @@ def get_operations_history():
 def add_operations_history(operation_id:str, label:str):
     cursor.execute("INSERT INTO payment_history (operation_id, label) VALUES (%s, %s)", (operation_id, label))
     connection.commit()
+
+
+async def reset_user(username:str):
+    user = get_user_by_username(username)
+    if user:
+        user.expire = datetime.datetime.now().timestamp() - 86400
+        await xui_api.client.update_vless_user(user)
+        return True
+    return False
     
     
 def sql_get(request: str):

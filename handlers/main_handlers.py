@@ -3,7 +3,7 @@ import decimal
 import storage
 import json
 import uuid
-from pinguins import info
+from pinguins import info1, info2
 from yoomoney import Quickpay
 from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
@@ -16,16 +16,20 @@ from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, INFO_CHAT_ID
 
 ro = Router(name=__name__)
 start_message="Используйте команду /menu"
-menu_text="it,s menu text"
+menu_text="Выберите интересующий раздел"
 
-menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="мой профиль", callback_data="get_vless")],
-                                                      [InlineKeyboardButton(text="тарифы", callback_data="pay")],
+menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мой профиль", callback_data="get_vless")],
+                                                      [InlineKeyboardButton(text="Тарифы", callback_data="pay")],
+                                                      [InlineKeyboardButton(text="Скачать приложение", callback_data="download")],
                                                       [InlineKeyboardButton(text="кто такие пингвины", callback_data="pinguins")]])
 back_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu")]])
 pay_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Продлить на 1 месяц (120 руб.)", callback_data="extend1")],
                                                      [InlineKeyboardButton(text="Продлить на 2 месяц (220 руб.)", callback_data="extend2")],
                                                      [InlineKeyboardButton(text="Продлить на 3 месяц (330 руб.)", callback_data="extend3")],
                                                      [InlineKeyboardButton(text="Назад", callback_data="menu")]])
+download_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="v2RayTun для Android", url="https://play.google.com/store/apps/details?id=com.v2raytun.android")],
+                                                          [InlineKeyboardButton(text="v2RayTun для IOS", url="https://apps.apple.com/ru/app/v2raytun/id6476628951")],
+                                                          [InlineKeyboardButton(text="Назад", callback_data="menu")]])
 
 class Support(StatesGroup):
     report_text = State()
@@ -65,7 +69,7 @@ async def get_chat_id(message:Message):
 
 @ro.callback_query(lambda c: c.data == "get_vless")
 async def get_vless(callback: CallbackQuery):
-    await callback.message.edit_text(f"ваша ссылка на vless (скопируйте её и вставте в hiddify)\n<pre>{VPN_SUBSCRIPTION_ADRESS}/{storage.get_user(callback.message.chat.id).subID}</pre>")
+    await callback.message.edit_text(f"Скопируйте данный профиль и вставьте в приложение ( нажав на (+) в правом верхнем углу)\n<pre>{VPN_SUBSCRIPTION_ADRESS}/{storage.get_user(callback.message.chat.id).subID}</pre>")
     await callback.message.edit_reply_markup(reply_markup=back_keyboard)
     
 
@@ -106,17 +110,35 @@ async def extend(callback: CallbackQuery):
         label=json.dumps(label)
     )
     await callback.message.edit_text(f"Продление на {mounts} месяц за {sum} рублей.\nСсылка для оплаты:")
-    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=quickpay.redirected_url)]]))
+    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=quickpay.redirected_url)],
+                                                                                                [InlineKeyboardButton(text="Назад", callback_data="menu")]]))
 
 
 @ro.callback_query(lambda c: c.data == "pinguins")
 async def pinguins(callback:CallbackQuery):
-    await callback.message.edit_text(info)
-    await callback.message.edit_reply_markup(reply_markup=back_keyboard)
+    msg1 = await callback.message.answer(info1)
+    await callback.message.delete()
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"menu{json.dumps([msg1.message_id])}")]])
+    await callback.message.answer(info2, reply_markup=keyboard)
+    
+
+@ro.callback_query(lambda c: c.data == "download")
+async def download(callback: CallbackQuery):
+    await callback.message.edit_text("Приложение для подключения VPN")
+    await callback.message.edit_reply_markup(reply_markup=download_keyboard)
+
+
+@ro.callback_query(lambda c: c.data[:4] == "menu")
+async def menu_pinguin(callback:CallbackQuery):
+    print(callback.data[4:])
+    await callback.message.delete()
+    await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[4:]))
+    await callback.message.answer(menu_text, reply_markup=menu_keyboard)
 
 
 @ro.message(Support.report_text)
 async def report(message:Message, state:FSMContext):
-    await message.bot.send_message(INFO_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}\n\n\n{message.text}")
+    await message.bot.send_message(INFO_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}")
+    await message.send_copy(INFO_CHAT_ID)
     await state.clear()
     await message.answer("сообщение успешно отправлено поддержке")

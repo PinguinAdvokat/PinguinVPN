@@ -100,7 +100,7 @@ def add_operations_history(operation_id:str, label:str):
 async def reset_user(username:str):
     user = get_user_by_username(username)
     if user:
-        user.expire = datetime.datetime.now().timestamp() - 86400
+        user.expire = int(datetime.datetime.now().timestamp() - 86400)
         await xui_api.client.update_vless_user(user)
         return True
     return False

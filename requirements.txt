@@ -11,7 +11,6 @@ idna==3.10
 magic-filter==1.0.12
 multidict==6.6.4
 propcache==0.3.2
-psycopg2==2.9.10
 pydantic==2.11.7
 pydantic_core==2.33.2
 typing-inspection==0.4.1
@@ -38,7 +37,6 @@ magic-filter==1.0.12
 MarkupSafe==3.0.2
 multidict==6.6.4
 propcache==0.3.2
-psycopg2==2.9.10
 pydantic==2.11.7
 pydantic_core==2.33.2
 requests==2.32.5

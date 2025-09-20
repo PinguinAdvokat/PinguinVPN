@@ -101,6 +101,7 @@ async def reset_user(username:str):
     user = get_user_by_username(username)
     if user:
         user.expire = int(datetime.datetime.now().timestamp() - 86400)
+        update_user(user)
         await xui_api.client.update_vless_user(user)
         return True
     return False

@@ -114,6 +114,13 @@ async def promo_usage(message:Message, state:FSMContext):
     await state.clear()
 
 
+@admin_r.message(Command("delete_promo"))
+async def del_promo(message:Message):
+    if message.chat.id in ADMIN_CHAT_IDS:
+        storage.delete_promo(message.text[14:])
+        await message.answer("успешно удалён")
+
+
 @admin_r.message(Spam.users)
 async def users(message:Message, state:FSMContext):
     users = str(message.text).split(' ')

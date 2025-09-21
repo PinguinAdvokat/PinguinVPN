@@ -16,10 +16,10 @@ from handlers.admin_handlers import admin_r
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 
-# async def payment_loop():
-#     while True:
-#         await payment.update_clients(bot)
-#         await asyncio.sleep(30)
+async def payment_loop():
+    while True:
+        await payment.update_clients(bot)
+        await asyncio.sleep(30)
 
 
 async def main() -> None:

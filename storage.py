@@ -134,5 +134,5 @@ def use_promo(name:str, chat_id:int):
 
 
 def remove_promo(name:str, chat_id:int):
-    cursor.execute(f"UPDATE promocodes SET usage = GREATEST(usage - 1, 0) users = ARRAY_APPEND(users, {chat_id}) WHERE name='{name}'")
+    cursor.execute(f"UPDATE promocodes SET usage = GREATEST(usage - 1, 0), users = ARRAY_APPEND(users, {chat_id}) WHERE name='{name}'")
     connection.commit()

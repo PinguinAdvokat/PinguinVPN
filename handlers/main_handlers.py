@@ -12,14 +12,15 @@ from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.types import (Message, CallbackQuery, 
                            InlineKeyboardMarkup, InlineKeyboardButton)
 from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, INFO_CHAT_ID
+from guide import PHOTOS_IDS, MESSAGES
 
 
 ro = Router(name=__name__)
 start_message="Используйте команду /menu"
 menu_text="Выберите интересующий раздел"
 
-menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мой профиль", callback_data="get_vless")],
-                                                      [InlineKeyboardButton(text="Тарифы", callback_data="pay")],
+menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мой профиль", callback_data="get_vless"), InlineKeyboardButton(text="Тарифы", callback_data="pay")],
+                                                      [InlineKeyboardButton(text="Промокод", callback_data="promo"), InlineKeyboardButton(text="Гайд", callback_data="guide")],
                                                       [InlineKeyboardButton(text="Скачать приложение", callback_data="download")],
                                                       [InlineKeyboardButton(text="кто такие пингвины", callback_data="pinguins")]])
 back_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu")]])
@@ -76,7 +77,7 @@ async def get_vless(callback: CallbackQuery):
 @ro.callback_query(lambda c: c.data == "menu")
 async def menu(callback: CallbackQuery):
      await callback.message.edit_text(menu_text)
-     await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
+     await callback.message.edit_reply_markup(reply_markup=pay_keyboard)
      
 
 @ro.callback_query(lambda c: c.data == "pay")
@@ -130,10 +131,29 @@ async def download(callback: CallbackQuery):
 
 @ro.callback_query(lambda c: c.data[:4] == "menu")
 async def menu_pinguin(callback:CallbackQuery):
-    print(callback.data[4:])
     await callback.message.delete()
     await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[4:]))
     await callback.message.answer(menu_text, reply_markup=menu_keyboard)
+
+
+@ro.callback_query(lambda c: c.data == "guide")
+async def guide(callback:CallbackQuery):
+    await callback.message.delete()
+    mess = []
+    mess.append(await callback.message.answer(MESSAGES[0]))
+    mess.append(await callback.message.answer_photo(photo=PHOTOS_IDS[0]))
+    mess.append(await callback.message.answer_photo(photo=PHOTOS_IDS[1]))
+    mess.append(await callback.message.answer(MESSAGES[1]))
+    for i in range(len(mess)):
+        mess[i] = mess[i].message_id
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"menu{json.dumps(mess)}")]])
+    await callback.message.answer_photo(photo=PHOTOS_IDS[2], reply_markup=keyboard)
+
+
+@ro.callback_query(lambda c: c.data == "promo")
+async def promo(callback:CallbackQuery):
+    await callback.message.edit_text("Если у вас есть промокод можете написать его")
+    await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
 
 
 @ro.message(Support.report_text)

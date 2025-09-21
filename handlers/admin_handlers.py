@@ -65,6 +65,12 @@ async def reset_user(message:Message):
             await message.answer("пользователь не найден")
 
 
+@admin_r.message(Command("get_photo_id"))
+async def get_photo_id(message:Message):
+    if message.chat.id in ADMIN_CHAT_IDS:
+        await message.answer(f"<pre>{message.photo[-1].file_id}</pre>")
+
+
 @admin_r.message(Spam.users)
 async def users(message:Message, state:FSMContext):
     users = str(message.text).split(' ')

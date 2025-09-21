@@ -115,7 +115,7 @@ def sql_get(request: str):
 
 def create_promo(name:str, months:int, price:int, usage:int):
     try:
-        cursor.execute("INSERT INTO promocodes (name, months, price, usage, users) VALUES (%s, %s, %s, %s, ARRAY[])", (name, months, price, usage))
+        cursor.execute("INSERT INTO promocodes (name, months, price, usage, users) VALUES (%s, %s, %s, %s, ARRAY[]::integer[])", (name, months, price, usage))
     except psycopg2.errors.UniqueViolation as ex:
         return False
     connection.commit()

@@ -77,7 +77,7 @@ async def get_vless(callback: CallbackQuery):
 @ro.callback_query(lambda c: c.data == "menu")
 async def menu(callback: CallbackQuery):
      await callback.message.edit_text(menu_text)
-     await callback.message.edit_reply_markup(reply_markup=pay_keyboard)
+     await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
      
 
 @ro.callback_query(lambda c: c.data == "pay")
@@ -119,7 +119,7 @@ async def extend(callback: CallbackQuery):
 async def pinguins(callback:CallbackQuery):
     msg1 = await callback.message.answer(info1)
     await callback.message.delete()
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"menu{json.dumps([msg1.message_id])}")]])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"remenu{json.dumps([msg1.message_id])}")]])
     await callback.message.answer(info2, reply_markup=keyboard)
     
 
@@ -129,10 +129,11 @@ async def download(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=download_keyboard)
 
 
-@ro.callback_query(lambda c: c.data[:4] == "menu")
+@ro.callback_query(lambda c: c.data[:6] == "remenu")
 async def menu_pinguin(callback:CallbackQuery):
     await callback.message.delete()
-    await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[4:]))
+    print(callback.data[6:])
+    await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[6:]))
     await callback.message.answer(menu_text, reply_markup=menu_keyboard)
 
 
@@ -146,14 +147,14 @@ async def guide(callback:CallbackQuery):
     mess.append(await callback.message.answer(MESSAGES[1]))
     for i in range(len(mess)):
         mess[i] = mess[i].message_id
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"menu{json.dumps(mess)}")]])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"remenu{json.dumps(mess)}")]])
     await callback.message.answer_photo(photo=PHOTOS_IDS[2], reply_markup=keyboard)
 
 
 @ro.callback_query(lambda c: c.data == "promo")
 async def promo(callback:CallbackQuery):
     await callback.message.edit_text("Если у вас есть промокод можете написать его")
-    await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
+    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu_state")]]))
 
 
 @ro.message(Support.report_text)

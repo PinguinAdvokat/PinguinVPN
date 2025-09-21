@@ -30,6 +30,7 @@ class User():
 
 cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id BIGINT UNIQUE, username VARCHAR(50), subID VARCHAR(50) UNIQUE, client_id VARCHAR(50) UNIQUE, expire BIGINT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
+cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT)")
 connection.commit()
 
 
@@ -110,3 +111,28 @@ async def reset_user(username:str):
 def sql_get(request: str):
     cursor.execute(request)
     return cursor.fetchall()
+
+
+def create_promo(name:str, months:int, price:int, usage:int):
+    try:
+        cursor.execute("INSERT INTO promocodes (name, months, price, usage) VALUES (%s, %s, %s, %s)", (name, months, price, usage))
+    except psycopg2.errors.UniqueViolation as ex:
+        return False
+    connection.commit()
+    return True
+
+
+def use_promo(name:str):
+    cursor.execute(f"SELECT * FROM promocodes WHERE name = '{name}' AND usage != 0")
+    res = cursor.fetchone()
+    if res:
+        return {
+            "months": res[2],
+            "price": res[3]
+        }
+    return res
+
+
+def remove_promo(name:str):
+    cursor.execute("UPDATE promocodes SET usage = GREATEST(usage - 1, 0) WHERE name=%s", (name))
+    connection.commit()

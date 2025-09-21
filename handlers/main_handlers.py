@@ -34,6 +34,25 @@ download_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(
 
 class Support(StatesGroup):
     report_text = State()
+class Promo(StatesGroup):
+    promo_state = State()
+
+
+def create_payment(chat_id:int, months:int, price:int, promo:str=""):
+    label = {
+        "chat_id": chat_id,
+        "months": months,
+        "pr": promo
+    }
+    quickpay = Quickpay(
+        receiver=YOOMONEY_RECEIVER,
+        quickpay_form="shop",
+        targets="Pinguin VPN",
+        paymentType="SB",
+        sum=price,
+        label=json.dumps(label)
+    )
+    return quickpay.redirected_url
 
 
 @ro.message(CommandStart())
@@ -59,8 +78,9 @@ async def menu(message:Message):
 
 @ro.message(Command("support"))
 async def support(message:Message, state:FSMContext):
-    await message.answer("Опишите вашу проблему в одном сообщении")
     await state.set_state(Support.report_text)
+    await message.answer("Опишите вашу проблему в одном сообщении", reply_markup=back_keyboard)
+
 
 
 @ro.message(Command("get_chat_id"))
@@ -75,9 +95,18 @@ async def get_vless(callback: CallbackQuery):
     
 
 @ro.callback_query(lambda c: c.data == "menu")
-async def menu(callback: CallbackQuery):
-     await callback.message.edit_text(menu_text)
-     await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
+async def menu(callback: CallbackQuery, state:FSMContext):
+    await state.clear()
+    await callback.message.edit_text(menu_text)
+    await callback.message.edit_reply_markup(reply_markup=menu_keyboard)
+
+
+@ro.callback_query(lambda c: c.data[:6] == "remenu")
+async def menu_pinguin(callback:CallbackQuery):
+    await callback.message.delete()
+    print(callback.data[6:])
+    await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[6:]))
+    await callback.message.answer(menu_text, reply_markup=menu_keyboard)
      
 
 @ro.callback_query(lambda c: c.data == "pay")
@@ -90,28 +119,17 @@ async def pay(callback: CallbackQuery):
 async def extend(callback: CallbackQuery):
     mounts = callback.data[6:]
     if mounts == "1":
-        sum = 5
+        price = 5
     elif mounts == "2":
-        sum = 220
+        price = 220
     elif mounts == "3":
-        sum = 330
+        price = 330
     else:
         await callback.answer("Возникла ошибка. Попробуйте позже")
         raise Exception("отсутствует callback для продления")
-    label = {
-        "chat_id": callback.message.chat.id,
-        "months": int(mounts)
-    }
-    quickpay = Quickpay(
-        receiver=YOOMONEY_RECEIVER,
-        quickpay_form="shop",
-        targets="Pinguin VPN",
-        paymentType="SB",
-        sum=sum,
-        label=json.dumps(label)
-    )
-    await callback.message.edit_text(f"Продление на {mounts} месяц за {sum} рублей.\nСсылка для оплаты:")
-    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=quickpay.redirected_url)],
+    url = create_payment(callback.message.chat.id, mounts, price)
+    await callback.message.edit_text(f"Продление на {mounts} месяц за {price} рублей.\nСсылка для оплаты:")
+    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],
                                                                                                 [InlineKeyboardButton(text="Назад", callback_data="menu")]]))
 
 
@@ -129,14 +147,6 @@ async def download(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=download_keyboard)
 
 
-@ro.callback_query(lambda c: c.data[:6] == "remenu")
-async def menu_pinguin(callback:CallbackQuery):
-    await callback.message.delete()
-    print(callback.data[6:])
-    await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[6:]))
-    await callback.message.answer(menu_text, reply_markup=menu_keyboard)
-
-
 @ro.callback_query(lambda c: c.data == "guide")
 async def guide(callback:CallbackQuery):
     await callback.message.delete()
@@ -152,10 +162,29 @@ async def guide(callback:CallbackQuery):
 
 
 @ro.callback_query(lambda c: c.data == "promo")
-async def promo(callback:CallbackQuery):
+async def promo(callback:CallbackQuery, state:FSMContext):
+    await state.set_state(Promo.promo_state)
     await callback.message.edit_text("Если у вас есть промокод можете написать его")
-    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="menu_state")]]))
+    await callback.message.edit_reply_markup(reply_markup=back_keyboard)
 
+
+@ro.message(Promo.promo_state)
+async def promo_state(message:Message, state:FSMContext):
+    print("promo")
+    await state.clear()
+    await asyncio.sleep(3)
+    promo = storage.use_promo(message.text)
+    if promo:
+        if promo["price"] == 0:
+            await storage.extend_user(message.chat.id, promo["months"])
+            storage.remove_promo(message.text)
+            await message.answer(f"ваш профиль продлён на {promo["months"]} месяц", reply_markup=back_keyboard)
+        else:
+            url = create_payment(message.chat.id, promo["months"], promo["price"], promo=message.text)
+            await message.answer(f"по промокоду {message} можно продлить профиль на {promo["months"]} за {promo["price"]}", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],
+                                                                                                                                                                               InlineKeyboardButton(text="Назад", callback_data="menu")]))
+    else:
+        await message.answer("промокод не найден")
 
 @ro.message(Support.report_text)
 async def report(message:Message, state:FSMContext):

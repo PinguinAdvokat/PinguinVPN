@@ -12,6 +12,11 @@ admin_r = Router(name=__name__)
 class Spam(StatesGroup):
     users = State()
     text = State()
+class Create_promo(StatesGroup):
+    name = State()
+    months = State()
+    price = State()
+    usage = State()
 
 
 @admin_r.message(Command("users"))
@@ -69,6 +74,44 @@ async def reset_user(message:Message):
 async def get_photo_id(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
         await message.answer(f"<pre>{message.photo[-1].file_id}</pre>")
+        
+
+@admin_r.message(Command("create_promo"))
+async def create_promo(message:Message, state:FSMContext):
+    if message.chat.id in ADMIN_CHAT_IDS:
+        await state.set_state(Create_promo.name)
+        await message.answer("название промокода (уникальное)")
+
+
+@admin_r.message(Create_promo.name)
+async def promo_name(message:Message, state:FSMContext):
+    await state.update_data(name=message.text)
+    await state.set_state(Create_promo.months)
+    await message.answer("количество месяцев для продления")
+
+
+@admin_r.message(Create_promo.months)
+async def promo_months(message:Message, state:FSMContext):
+    await state.update_data(months=int(message.text))
+    await state.set_state(Create_promo.price)
+    await message.answer("стоимость для оплаты по промокоду (0 = бесплатно)")
+    
+
+@admin_r.message(Create_promo.price)
+async def promo_price(message:Message, state:FSMContext):
+    await state.update_data(price=int(message.text))
+    await state.set_state(Create_promo.usage)
+    await message.answer("количество использований")
+
+
+@admin_r.message(Create_promo.usage)
+async def promo_usage(message:Message, state:FSMContext):
+    data = await state.get_data()
+    if storage.create_promo(data["name"], data["months"], data["price"], int(message.text)):
+        await message.answer("промокод успешно добавлен")
+    else:
+        await message.answer("такой промокод уже есть")
+    await state.clear()
 
 
 @admin_r.message(Spam.users)

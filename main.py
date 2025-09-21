@@ -25,7 +25,7 @@ async def payment_loop():
 async def main() -> None:
     dp = Dispatcher()
     dp.include_router(ro)
-    dp.include_router(error_router)
+    # dp.include_router(error_router)
     dp.include_router(admin_r)
     await asyncio.gather(dp.start_polling(bot))
     

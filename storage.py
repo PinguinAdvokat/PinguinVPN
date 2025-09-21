@@ -30,7 +30,7 @@ class User():
 
 cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id BIGINT UNIQUE, username VARCHAR(50), subID VARCHAR(50) UNIQUE, client_id VARCHAR(50) UNIQUE, expire BIGINT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
-cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users INT[])")
+cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users BIGINT[])")
 connection.commit()
 
 

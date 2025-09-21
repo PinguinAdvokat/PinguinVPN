@@ -30,7 +30,7 @@ class User():
 
 cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id BIGINT UNIQUE, username VARCHAR(50), subID VARCHAR(50) UNIQUE, client_id VARCHAR(50) UNIQUE, expire BIGINT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
-cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users INT[])")
 connection.commit()
 
 
@@ -122,8 +122,8 @@ def create_promo(name:str, months:int, price:int, usage:int):
     return True
 
 
-def use_promo(name:str):
-    cursor.execute(f"SELECT * FROM promocodes WHERE name = '{name}' AND usage != 0")
+def use_promo(name:str, chat_id:int):
+    cursor.execute(f"SELECT * FROM promocodes WHERE name = '{name}' AND usage != 0 AND NOT {chat_id} = ANY(users)")
     res = cursor.fetchone()
     if res:
         return {
@@ -133,6 +133,6 @@ def use_promo(name:str):
     return res
 
 
-def remove_promo(name:str):
-    cursor.execute(f"UPDATE promocodes SET usage = GREATEST(usage - 1, 0) WHERE name='{name}'")
+def remove_promo(name:str, chat_id:int):
+    cursor.execute(f"UPDATE promocodes SET usage = GREATEST(usage - 1, 0) users = ARRAY_APPEND(users, {chat_id}) WHERE name='{name}'")
     connection.commit()

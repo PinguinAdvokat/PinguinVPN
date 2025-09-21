@@ -134,5 +134,5 @@ def use_promo(name:str):
 
 
 def remove_promo(name:str):
-    cursor.execute("UPDATE promocodes SET usage = GREATEST(usage - 1, 0) WHERE name=%s", (name))
+    cursor.execute(f"UPDATE promocodes SET usage = GREATEST(usage - 1, 0) WHERE name='{name}'")
     connection.commit()

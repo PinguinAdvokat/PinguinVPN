@@ -21,7 +21,7 @@ async def update_clients(bot: Bot):
                 storage.remove_promo(js["pr"], js["chat_id"])
                 await storage.extend_user(js["chat_id"], js["months"])
                 storage.add_operations_history(history[i].operation_id, history[i].label)
-                await bot.send_message(js["chat_id"], f"ваш профиль продлён на {js["months"]} месяц.\nКоллеги, не ходите на сайты с порнографией. Весь ваш трафик под контролем. Попадёте на запрещённый ресурс — будут проблемы. Не усложняйте себе жизнь.")
+                await bot.send_message(js["chat_id"], f"Тариф успешно продлен на {js["months"]} месяц(ов), приятного пользования !\n(По всем вопросам обращайтесь в поддержку)")
     else:
         for i in range(len(history)):
             storage.add_operations_history(history[i].operation_id, history[i].label)

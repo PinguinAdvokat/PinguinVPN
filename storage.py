@@ -18,7 +18,7 @@ cursor = connection.cursor()
 class User():
     def __init__(self, chat_id:int, username:str, subID:str, client_id:str, expire:int=None):
         if not expire:
-            date = datetime.datetime.now().timestamp() - 86400
+            date = datetime.datetime.now().timestamp() + 2629743
             self.expire = int(date)
         else:
             self.expire = expire

@@ -119,7 +119,7 @@ async def pay(callback: CallbackQuery):
 async def extend(callback: CallbackQuery):
     mounts = callback.data[6:]
     if mounts == "1":
-        price = 5
+        price = 120
     elif mounts == "2":
         price = 220
     elif mounts == "3":

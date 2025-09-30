@@ -36,7 +36,7 @@ class Xui_client():
     async def add_vless_user(self, user:User):
         if not self._cookies:
             await self.login()
-        client = f"\"comment\":\"From Pinguin Bot\",\"id\":\"{user.client_id}\",\"alterId\":0,\"email\":\"{user.username}\",\"limitIp\":0,\"totalGB\":0,\"expiryTime\":{user.expire}000,\"flow\": \"xtls-rprx-vision\",\"enable\":true,\"tgId\":\"\",\"subId\":\"{user.subID}\""
+        client = f"\"comment\":\"From Pinguin Bot\",\"id\":\"{user.client_id}\",\"alterId\":0,\"email\":\"{user.username}\",\"limitIp\":1,\"totalGB\":0,\"expiryTime\":{user.expire}000,\"flow\": \"xtls-rprx-vision\",\"enable\":true,\"tgId\":\"\",\"subId\":\"{user.subID}\""
         payload = {
             "id": VPN_INBOUND_ID,
             "settings": "{\"clients\":[{"+client+"}]}"

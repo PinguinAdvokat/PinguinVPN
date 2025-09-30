@@ -123,7 +123,7 @@ async def extend(callback: CallbackQuery):
     elif mounts == "2":
         price = 220
     elif mounts == "3":
-        price = 330
+        price = 310
     else:
         await callback.answer("Возникла ошибка. Попробуйте позже")
         raise Exception("отсутствует callback для продления")

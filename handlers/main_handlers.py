@@ -63,7 +63,7 @@ async def start(message:Message):
     user = storage.User(message.chat.id, username, subID=str(uuid.uuid1()), client_id=str(uuid.uuid1()))
     ok = await storage.add_user(user)
     if ok:
-        await message.answer(f"вы были успешно зарегистрированы\n{start_message}\nПеовый месяц бесплатно!")
+        await message.answer(f"вы были успешно зарегистрированы\n{start_message}\nПервый месяц бесплатно!")
     else:
         await message.answer(start_message)
 

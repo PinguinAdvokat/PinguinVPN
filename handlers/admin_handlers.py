@@ -129,7 +129,7 @@ async def get_vote(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
         with open("questioners.json", "r") as f:
             data = json.load(f)
-        await message.answer(data)
+        await message.answer(str(data))
 
 
 @admin_r.message(Command("vote"))
@@ -151,9 +151,17 @@ async def answers(message:Message, state:FSMContext):
     text = await state.get_data()
     answers = message.text.split(" ")
     t = {}
+    buttons = []
     for i in answers:
         t.update({i: []})
+        buttons.append([InlineKeyboardButton(text=i, callback_data=f"question {text} {i}")])
     storage.add_questionary(text["question"], t)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    storage.cursor.execute("SELECT chat_id FROM users")
+    ids = storage.cursor.fetchall()
+    for i in ids:
+        await message.bot.send_message(i, text, reply_markup=keyboard)
+    await message.answer("опросник успешно отправлен")
 
 
 @admin_r.message(Spam.users)

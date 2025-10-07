@@ -144,7 +144,7 @@ async def answers(message:Message, state:FSMContext):
     t = {}
     for i in answers:
         t.update({i: []})
-    storage.add_questionary(text["question"], answers)
+    storage.add_questionary(text["question"], t)
 
 
 @admin_r.message(Spam.users)

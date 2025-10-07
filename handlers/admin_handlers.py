@@ -132,7 +132,7 @@ async def vote(message:Message, state:FSMContext):
 
 @admin_r.message(Vote.question)
 async def vote_question(message:Message, state:FSMContext):
-    await state.set_data(question=message.text)
+    await state.update_data(question=message.text)
     await message.answer("Варианты ответа через пробел")
     await state.set_state(Vote.answers)
 

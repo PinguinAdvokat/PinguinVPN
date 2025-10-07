@@ -144,5 +144,5 @@ def delete_promo(name:str):
     connection.commit()
 
 def add_questionary(text:str, answers:dict):
-    cursor.execute("INSERT INTO questionnaire (question, voting_data) VALUES (%s, %s)", (text, answers))
+    cursor.execute("INSERT INTO questionnaire (question, voting_data) VALUES (%s, %s)", (text, psycopg2.extras.Json(answers)))
     connection.commit()

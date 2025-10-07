@@ -127,7 +127,7 @@ async def del_promo(message:Message):
 @admin_r.message(Command("get_vote"))
 async def get_vote(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        with open("questioners.json", "r") as f:
+        with open("/etc/pinguin_vpn_bot/questioners.json", "r") as f:
             data = json.load(f)
         await message.answer(str(data))
 

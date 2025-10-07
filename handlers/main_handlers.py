@@ -198,5 +198,5 @@ async def report(message:Message, state:FSMContext):
 async def question(callback:CallbackQuery):
     data = callback.data.split(" ")
     storage.answer(data[1], data[2], callback.from_user.username)
-    await callback.message.delete()
     await callback.answer("Спасибо за ответ")
+    await callback.message.delete()

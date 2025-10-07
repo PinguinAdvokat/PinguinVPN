@@ -123,15 +123,16 @@ async def del_promo(message:Message):
         await message.answer("успешно удалён")
 
 
-@admin_r.message(Command("Vote"))
+@admin_r.message(Command("vote"))
 async def vote(message:Message, state:FSMContext):
-    await message.answer("Вопрос:")
-    await state.set_state(Vote.question)
+    if message.chat.id in ADMIN_CHAT_IDS:
+        await message.answer("Вопрос:")
+        await state.set_state(Vote.question)
 
 
 @admin_r.message(Vote.question)
-async def question(message:Message, state:FSMContext):
-    await state.set_data(text=message.text)
+async def vote_question(message:Message, state:FSMContext):
+    await state.set_data(question=message.text)
     await message.answer("Варианты ответа через пробел")
     await state.set_state(Vote.answers)
 
@@ -143,7 +144,7 @@ async def answers(message:Message, state:FSMContext):
     t = {}
     for i in answers:
         t.update({i: []})
-    storage.add_questionary(text, answers)
+    storage.add_questionary(text["question"], answers)
 
 
 @admin_r.message(Spam.users)

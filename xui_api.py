@@ -1,9 +1,6 @@
 import aiohttp
 import datetime
-import asyncio
 import uuid
-import json
-from decimal import Decimal
 from config import VPN_API_URL, VPN_API_LOGIN, VPN_API_PASSWORD, VPN_INBOUND_ID
 
 class User():
@@ -22,7 +19,7 @@ class User():
 class Xui_client():
     def __init__(self):
         self._cookies = None
-        
+
     async def login(self):
         async with aiohttp.ClientSession() as session:
             async with session.post(f"{VPN_API_URL}/login", json={"username": VPN_API_LOGIN, "password": VPN_API_PASSWORD}, ssl=False) as response:
@@ -32,7 +29,7 @@ class Xui_client():
                 else:
                     print("error while logging in 3x-ui:", await response.text)
 
-    
+
     async def add_vless_user(self, user:User):
         if not self._cookies:
             await self.login()
@@ -48,7 +45,7 @@ class Xui_client():
                 if response.status == 200 and js["success"]:
                     return True
                 raise ConnectionError(f"не удалось добавить пользователя ({response.status}): {await response.text()}")
-    
+
     async def update_vless_user(self, user:User):
         if not self._cookies:
             await self.login()

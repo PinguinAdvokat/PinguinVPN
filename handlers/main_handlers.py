@@ -9,7 +9,7 @@ from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandStart, StateFilter
-from aiogram.types import (Message, CallbackQuery, 
+from aiogram.types import (Message, CallbackQuery,
                            InlineKeyboardMarkup, InlineKeyboardButton)
 from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, INFO_CHAT_ID
 from guide import PHOTOS_IDS, MESSAGES
@@ -92,7 +92,7 @@ async def get_chat_id(message:Message):
 async def get_vless(callback: CallbackQuery):
     await callback.message.edit_text(f"Скопируйте данный профиль и вставьте в приложение ( нажав на (+) в правом верхнем углу)\n<pre>{VPN_SUBSCRIPTION_ADRESS}/{storage.get_user(callback.message.chat.id).subID}</pre>")
     await callback.message.edit_reply_markup(reply_markup=back_keyboard)
-    
+
 
 @ro.callback_query(lambda c: c.data == "menu")
 async def menu(callback: CallbackQuery, state:FSMContext):
@@ -107,7 +107,7 @@ async def menu_pinguin(callback:CallbackQuery):
     print(callback.data[6:])
     await callback.bot.delete_messages(callback.message.chat.id, json.loads(callback.data[6:]))
     await callback.message.answer(menu_text, reply_markup=menu_keyboard)
-     
+
 
 @ro.callback_query(lambda c: c.data == "pay")
 async def pay(callback: CallbackQuery):
@@ -139,7 +139,7 @@ async def pinguins(callback:CallbackQuery):
     await callback.message.delete()
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data=f"remenu{json.dumps([msg1.message_id])}")]])
     await callback.message.answer(info2, reply_markup=keyboard)
-    
+
 
 @ro.callback_query(lambda c: c.data == "download")
 async def download(callback: CallbackQuery):
@@ -176,7 +176,7 @@ async def promo_state(message:Message, state:FSMContext):
     promo = storage.use_promo(message.text, message.chat.id)
     if promo:
         if promo["price"] == 0:
-            await storage.extend_user(message.chat.id, promo["months"])
+            await storage.extend_user(message.chat.id, promo["months"] * 30)
             storage.remove_promo(message.text, message.chat.id)
             await message.answer(f"ваш профиль продлён на {promo["months"]} месяц", reply_markup=back_keyboard)
         else:

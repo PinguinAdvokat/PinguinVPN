@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandStart
-from aiogram.types import (Message, CallbackQuery, 
+from aiogram.types import (Message, CallbackQuery,
                            InlineKeyboardMarkup, InlineKeyboardButton)
 from config import ADMIN_CHAT_IDS
 
@@ -28,14 +28,13 @@ async def users(message: Message):
 @admin_r.message(Command("extend_user"))
 async def extend_user(message: Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        print(message.text[13:])
-        user = storage.get_user_by_username(message.text[13:])
+        user = storage.get_user_by_username(message.text.split(" ")[1])
         if user:
-            await storage.extend_user(user.chat_id, 1)
+            await storage.extend_user(user.chat_id, int(message.text.split(" ")[2]))
             await message.answer("пользователь продлён на месяц")
         else:
             await message.answer("пользователь не найден")
-        
+
 
 @admin_r.message(Command("spam"))
 async def set_spam(message:Message, state:FSMContext):
@@ -58,7 +57,7 @@ async def send(message:Message, state:FSMContext):
 @admin_r.message(Command("admin"))
 async def admin_panel(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
-        await message.answer("продлить пользователя на 1 месяц /extend_user username\nпоставить дату окончания на вчера /reset_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send")
+        await message.answer("продлить пользователя на n дней месяц /extend_user username n\nпоставить дату окончания на вчера /reset_user username\nсписок всех пользователей /users\nмассовая рассылка /spam\nвыборачная рассылка /send")
 
 
 @admin_r.message(Command("reset_user"))
@@ -74,7 +73,7 @@ async def reset_user(message:Message):
 async def get_photo_id(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
         await message.answer(f"<pre>{message.photo[-1].file_id}</pre>")
-        
+
 
 @admin_r.message(Command("create_promo"))
 async def create_promo(message:Message, state:FSMContext):
@@ -95,7 +94,7 @@ async def promo_months(message:Message, state:FSMContext):
     await state.update_data(months=int(message.text))
     await state.set_state(Create_promo.price)
     await message.answer("стоимость для оплаты по промокоду (0 = бесплатно)")
-    
+
 
 @admin_r.message(Create_promo.price)
 async def promo_price(message:Message, state:FSMContext):

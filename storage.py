@@ -26,7 +26,7 @@ class User():
         self.username = username
         self.subID = subID
         self.client_id = client_id
-        
+
 
 cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id BIGINT UNIQUE, username VARCHAR(50), subID VARCHAR(50) UNIQUE, client_id VARCHAR(50) UNIQUE, expire BIGINT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
@@ -48,7 +48,7 @@ async def add_user(user:User):
         return False
     if await xui_api.client.add_vless_user(user):
             connection.commit()
-            return True 
+            return True
     connection.rollback()
     return False
 
@@ -74,16 +74,16 @@ def update_user(user:User):
     connection.commit()
 
 
-async def extend_user(chat_id:int, mounths:int):
+async def extend_user(chat_id:int, days:int):
     user = get_user(chat_id)
     if not user:
         return
     if user.expire < int(datetime.datetime.now().timestamp()):
         #продление на n мясяц с сегодняшнего дня
-        user.expire = int(datetime.datetime.now().timestamp()) + (2629743 * mounths)
+        user.expire = int(datetime.datetime.now().timestamp()) + (86400 * days)
     else:
         #продление на n мясяц с дня окночания
-        user.expire += 2629743 * mounths
+        user.expire += 86400 * days
     update_user(user)
     await xui_api.client.update_vless_user(user)
 
@@ -106,8 +106,8 @@ async def reset_user(username:str):
         await xui_api.client.update_vless_user(user)
         return True
     return False
-    
-    
+
+
 def sql_get(request: str):
     cursor.execute(request)
     return cursor.fetchall()

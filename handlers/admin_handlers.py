@@ -1,4 +1,5 @@
 import storage
+import json
 from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -121,6 +122,14 @@ async def del_promo(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
         storage.delete_promo(message.text[14:])
         await message.answer("успешно удалён")
+
+
+@admin_r.message(Command("get_vote"))
+async def get_vote(message:Message):
+    if message.chat.id in ADMIN_CHAT_IDS:
+        with open("questioners.json", "r") as f:
+            data = json.load(f)
+        await message.answer(data)
 
 
 @admin_r.message(Command("vote"))

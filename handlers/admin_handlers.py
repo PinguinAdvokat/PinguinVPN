@@ -159,8 +159,9 @@ async def answers(message:Message, state:FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     storage.cursor.execute("SELECT chat_id FROM users")
     ids = storage.cursor.fetchall()
-    for i in ids:
-        await message.bot.send_message(i, text, reply_markup=keyboard)
+    await message.bot.send_message(5111168208, text, reply_markup=keyboard)
+    # for i in ids:
+    #     await message.bot.send_message(i, text, reply_markup=keyboard)
     await message.answer("опросник успешно отправлен")
 
 

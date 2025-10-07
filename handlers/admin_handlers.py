@@ -148,18 +148,18 @@ async def vote_question(message:Message, state:FSMContext):
 
 @admin_r.message(Vote.answers)
 async def answers(message:Message, state:FSMContext):
-    text = await state.get_data()
+    data = await state.get_data()
     answers = message.text.split(" ")
     t = {}
     buttons = []
     for i in answers:
         t.update({i: []})
-        buttons.append([InlineKeyboardButton(text=i, callback_data=f"question {text} {i}")])
-    storage.add_questionary(text["question"], t)
+        buttons.append([InlineKeyboardButton(text=i, callback_data=f"question {data["question"]} {i}")])
+    storage.add_questionary(data["question"], t)
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     storage.cursor.execute("SELECT chat_id FROM users")
     ids = storage.cursor.fetchall()
-    await message.bot.send_message(5111168208, text, reply_markup=keyboard)
+    await message.bot.send_message(5111168208, data["question"], reply_markup=keyboard)
     # for i in ids:
     #     await message.bot.send_message(i, text, reply_markup=keyboard)
     await message.answer("опросник успешно отправлен")

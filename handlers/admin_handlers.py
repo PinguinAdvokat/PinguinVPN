@@ -124,7 +124,7 @@ async def del_promo(message:Message):
 
 
 @admin_r.message(Command("Vote"))
-async def Vote(message:Message, state:FSMContext):
+async def vote(message:Message, state:FSMContext):
     await message.answer("Вопрос:")
     await state.set_state(Vote.question)
 

@@ -17,7 +17,7 @@ from guide import PHOTOS_IDS, MESSAGES
 
 ro = Router(name=__name__)
 start_message="Используйте команду /menu"
-menu_text="Выберите интересующий раздел"
+menu_text="Выберите интересующий раздел. Если что-то не работает или у вас есть вопрос обратитесь в поддержку /support"
 
 menu_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мой профиль", callback_data="get_vless"), InlineKeyboardButton(text="Тарифы", callback_data="pay")],
                                                       [InlineKeyboardButton(text="Промокод", callback_data="promo"), InlineKeyboardButton(text="Гайд", callback_data="guide")],

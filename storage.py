@@ -31,6 +31,7 @@ class User():
 cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id BIGINT UNIQUE, username VARCHAR(50), subID VARCHAR(50) UNIQUE, client_id VARCHAR(50) UNIQUE, expire BIGINT)")
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
 cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users BIGINT[])")
+cursor.execute("CREATE TABLE IF NOT EXISTS questionnaire (id SERIAL PRIMARY KEY, question VARCHAR(100), voting_data JSON)")
 connection.commit()
 
 
@@ -140,4 +141,8 @@ def remove_promo(name:str, chat_id:int):
 
 def delete_promo(name:str):
     cursor.execute(f"DELETE FROM promocodes WHERE name='{name}'")
+    connection.commit()
+
+def add_questionary(text:str, answers:dict):
+    cursor.execute("INSERT INTO questionnaire (question, data) VALUES (%s, %s)", (text, answers))
     connection.commit()

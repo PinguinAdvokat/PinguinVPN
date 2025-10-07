@@ -17,6 +17,9 @@ class Create_promo(StatesGroup):
     months = State()
     price = State()
     usage = State()
+class Vote(StatesGroup):
+    question = State()
+    answers = State()
 
 
 @admin_r.message(Command("users"))
@@ -118,6 +121,29 @@ async def del_promo(message:Message):
     if message.chat.id in ADMIN_CHAT_IDS:
         storage.delete_promo(message.text[14:])
         await message.answer("успешно удалён")
+
+
+@admin_r.message(Command("Vote"))
+async def Vote(message:Message, state:FSMContext):
+    await message.answer("Вопрос:")
+    await state.set_state(Vote.question)
+
+
+@admin_r.message(Vote.question)
+async def question(message:Message, state:FSMContext):
+    await state.set_data(text=message.text)
+    await message.answer("Варианты ответа через пробел")
+    await state.set_state(Vote.answers)
+
+
+@admin_r.message(Vote.answers)
+async def answers(message:Message, state:FSMContext):
+    text = await state.get_data()
+    answers = message.text.split(" ")
+    t = {}
+    for i in answers:
+        t.update({i: []})
+    storage.add_questionary(text, answers)
 
 
 @admin_r.message(Spam.users)

@@ -33,11 +33,6 @@ cursor.execute("CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, chat_id
 cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KEY, operation_id VARCHAR(50), label VARCHAR(65))")
 cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users BIGINT[])")
 connection.commit()
-try:
-    open("questioners.json", "r")
-except:
-    with open("questioners.json", "w") as f:
-        json.dump([], f)
 
 
 def add_payment(operation_id:int, label:str):
@@ -149,8 +144,8 @@ def delete_promo(name:str):
     connection.commit()
 
 def add_questionary(text:str, answers:dict):
-    with open("questioners.json", "r") as f:
+    with open("questioners.json", "r", encoding="ascii") as f:
         data = json.load(f)
     data.append({text: answers})
     with open("questioners.json", "w") as f:
-        json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False)

@@ -34,9 +34,9 @@ cursor.execute("CREATE TABLE IF NOT EXISTS payment_history (id SERIAL PRIMARY KE
 cursor.execute("CREATE TABLE IF NOT EXISTS promocodes (id SERIAL PRIMARY KEY, name VARCHAR(20) UNIQUE, months INT, price INT, usage INT, users BIGINT[])")
 connection.commit()
 try:
-    open("questioners", "r")
+    open("questioners.json", "r")
 except:
-    with open("questioners", "w") as f:
+    with open("questioners.json", "w") as f:
         json.dump([], f)
 
 

@@ -159,6 +159,6 @@ def add_questionary(text:str, answers:dict):
 def answer(text:str, answer:str, username:str):
     with open("/etc/pinguin_vpn_bot/questioners.json", "r", encoding="ascii") as f:
         data = json.load(f)
-    data[text][answer].append(username)
+    data[text[:8]][answer].append(username)
     with open("/etc/pinguin_vpn_bot/questioners.json", "w", encoding="ascii") as f:
         json.dump(data, f)

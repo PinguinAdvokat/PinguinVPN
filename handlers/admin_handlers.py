@@ -163,7 +163,7 @@ async def answers(message:Message, state:FSMContext):
     storage.cursor.execute("SELECT chat_id FROM users")
     ids = storage.cursor.fetchall()
     for i in ids:
-        await message.bot.send_message(5111168208, data["question"], reply_markup=keyboard)
+        await message.bot.send_message(int(i[0]), data["question"], reply_markup=keyboard)
     await message.answer("опросник успешно отправлен")
 
 

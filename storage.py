@@ -151,7 +151,7 @@ def delete_promo(name:str):
 def add_questionary(text:str, answers:dict):
     with open("/etc/pinguin_vpn_bot/questioners.json", "r", encoding="ascii") as f:
         data = json.load(f)
-    data.update({text: answers})
+    data.update({text[:8]: answers})
     with open("/etc/pinguin_vpn_bot/questioners.json", "w", encoding="ascii") as f:
         json.dump(data, f)
 

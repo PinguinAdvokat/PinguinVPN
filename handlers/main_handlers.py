@@ -194,9 +194,9 @@ async def report(message:Message, state:FSMContext):
     await message.answer("сообщение успешно отправлено поддержке")
 
 
-@ro.callback_query(lambda c: c.data.split(" ")[0] == "question")
+@ro.callback_query(lambda c: c.data.split("_")[0] == "que")
 async def question(callback:CallbackQuery):
-    data = callback.data.split(" ")
+    data = callback.data.split("_")
     storage.answer(data[1], data[2], callback.from_user.username)
     await callback.answer("Спасибо за ответ")
     await callback.message.delete()

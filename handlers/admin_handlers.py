@@ -155,6 +155,7 @@ async def answers(message:Message, state:FSMContext):
     for i in answers:
         t.update({i: []})
         callback = f"question {data['question']} {i}"
+        print(callback)
         buttons.append(InlineKeyboardButton(text=i, callback_data=callback))
     storage.add_questionary(data["question"], t)
     keyboard = InlineKeyboardMarkup(inline_keyboard=[buttons])

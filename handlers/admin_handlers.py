@@ -154,9 +154,9 @@ async def answers(message:Message, state:FSMContext):
     buttons = []
     for i in answers:
         t.update({i: []})
-        buttons.append([InlineKeyboardButton(text=i, callback_data=f"question {data["question"]} {i}")])
+        buttons.append(InlineKeyboardButton(text=i, callback_data=f"question {data["question"]} {i}"))
     storage.add_questionary(data["question"], t)
-    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[buttons])
     storage.cursor.execute("SELECT chat_id FROM users")
     ids = storage.cursor.fetchall()
     for i in ids:

@@ -149,6 +149,7 @@ async def vote_question(message:Message, state:FSMContext):
 @admin_r.message(Vote.answers)
 async def answers(message:Message, state:FSMContext):
     data = await state.get_data()
+    await state.clear()
     answers = message.text.split(" ")
     t = {}
     buttons = []

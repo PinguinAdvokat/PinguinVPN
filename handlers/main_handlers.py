@@ -58,7 +58,7 @@ def create_payment(chat_id:int, months:int, price:int, promo:str=""):
 @ro.message(CommandStart())
 async def start(message:Message):
     username = message.from_user.username
-    if username == "":
+    if not username:
         username = str(uuid.uuid1())
     user = storage.User(message.chat.id, username, subID=str(uuid.uuid1()), client_id=str(uuid.uuid1()))
     ok = await storage.add_user(user)

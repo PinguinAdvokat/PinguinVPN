@@ -89,7 +89,7 @@ async def extend_user(chat_id:int, days:int):
         user.expire = int(datetime.datetime.now().timestamp()) + (2629743 * days)
     else:
         #продление на n мясяц с дня окночания
-        user.expire += 86400 * days
+        user.expire += 2629743 * days
     update_user(user)
     await xui_api.client.update_vless_user(user)
 

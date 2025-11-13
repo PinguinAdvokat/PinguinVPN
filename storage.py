@@ -86,7 +86,7 @@ async def extend_user(chat_id:int, days:int):
         return
     if user.expire < int(datetime.datetime.now().timestamp()):
         #продление на n мясяц с сегодняшнего дня
-        user.expire = int(datetime.datetime.now().timestamp()) + (86400 * days)
+        user.expire = int(datetime.datetime.now().timestamp()) + (2629743 * days)
     else:
         #продление на n мясяц с дня окночания
         user.expire += 86400 * days

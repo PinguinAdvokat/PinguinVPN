@@ -4,14 +4,14 @@ import storage
 import json
 import uuid
 from pinguins import info1, info2
-from yoomoney import Quickpay
+from aiohttp import ClientSession
 from aiogram import Router, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.types import (Message, CallbackQuery,
                            InlineKeyboardMarkup, InlineKeyboardButton)
-from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, INFO_CHAT_ID
+from config import VPN_SUBSCRIPTION_ADRESS, YOOMONEY_RECEIVER, YOOMONEY_TOKEN, INFO_CHAT_ID
 from guide import PHOTOS_IDS, MESSAGES
 
 
@@ -38,21 +38,22 @@ class Promo(StatesGroup):
     promo_state = State()
 
 
-def create_payment(chat_id:int, months:int, price:int, promo:str=""):
+async def create_payment(chat_id:int, months:int, price:int, promo:str=""):
     label = {
         "chat_id": chat_id,
         "months": months,
         "pr": promo
     }
-    quickpay = Quickpay(
-        receiver=YOOMONEY_RECEIVER,
-        quickpay_form="shop",
-        targets="Pinguin VPN",
-        paymentType="SB",
-        sum=price,
-        label=json.dumps(label)
-    )
-    return quickpay.redirected_url
+    async with ClientSession() as session:
+        url = 'https://yoomoney.ru/quickpay/confirm'
+        params = {
+            'receiver': YOOMONEY_RECEIVER,
+            'quickpay-form': 'shop',
+            'sum': price,
+            'label': label
+        }
+        async with session.post(url=url, headers={'Authorization': YOOMONEY_TOKEN}, params=params, allow_redirects=False) as response:
+            return response.headers.get('Location')
 
 
 @ro.message(CommandStart())
@@ -128,7 +129,7 @@ async def extend(callback: CallbackQuery):
         await callback.answer("Возникла ошибка. Попробуйте позже")
         raise Exception("отсутствует callback для продления")
     print("creating payment...")
-    url = create_payment(callback.message.chat.id, int(mounts), price)
+    url = await create_payment(callback.message.chat.id, int(mounts), price)
     print('done')
     await callback.message.edit_text(f"Продление на {mounts} месяц за {price} рублей.\nСсылка для оплаты:")
     await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],

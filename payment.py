@@ -1,17 +1,14 @@
 import json
 import storage
+from aiohttp import ClientSession, web
 from aiogram import Bot
-from yoomoney import Client
-from  config import YOOMONEY_TOKEN
-
-
-client = Client(token=YOOMONEY_TOKEN)
+from config import YOOMONEY_TOKEN
 
 
 async def update_clients(bot: Bot):
     bd_history = storage.get_operations_history()
     try:
-        history = client.operation_history().operations
+        history = await get_yoomoney_history(YOOMONEY_TOKEN)
     except:
         return
     if len(bd_history) != 0:
@@ -25,3 +22,12 @@ async def update_clients(bot: Bot):
     else:
         for i in range(len(history)):
             storage.add_operations_history(history[i].operation_id, history[i].label)
+
+
+async def get_yoomoney_history(token):
+    async with ClientSession() as session:
+        url = "https://yoomoney.ru/api/operation-history"
+        params = {}
+        async with session.get(url=url, params=params, headers={'Authorization': token}) as response:
+            js = await response.json()
+            return js['operations']

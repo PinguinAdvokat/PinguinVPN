@@ -50,7 +50,7 @@ async def create_payment(chat_id:int, months:int, price:int, promo:str=""):
             'receiver': YOOMONEY_RECEIVER,
             'quickpay-form': 'shop',
             'sum': price,
-            'label': label
+            'label': str(label)
         }
         async with session.post(url=url, headers={'Authorization': YOOMONEY_TOKEN}, params=params, allow_redirects=False) as response:
             return response.headers.get('Location')

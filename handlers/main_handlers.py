@@ -127,7 +127,9 @@ async def extend(callback: CallbackQuery):
     else:
         await callback.answer("Возникла ошибка. Попробуйте позже")
         raise Exception("отсутствует callback для продления")
+    print("creating payment...")
     url = create_payment(callback.message.chat.id, int(mounts), price)
+    print('done')
     await callback.message.edit_text(f"Продление на {mounts} месяц за {price} рублей.\nСсылка для оплаты:")
     await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],
                                                                                                 [InlineKeyboardButton(text="Назад", callback_data="menu")]]))

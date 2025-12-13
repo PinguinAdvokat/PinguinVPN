@@ -181,7 +181,7 @@ async def promo_state(message:Message, state:FSMContext):
         if promo["price"] == 0:
             await storage.extend_user(message.chat.id, promo["months"] * 30)
             storage.remove_promo(message.text, message.chat.id)
-            await message.answer(f"ваш профиль продлён на {promo["months"]} месяц", reply_markup=back_keyboard)
+            await message.answer(f'ваш профиль продлён на {promo["months"]} месяц', reply_markup=back_keyboard)
         else:
             url = create_payment(message.chat.id, promo["months"], promo["price"], promo=message.text)
             await message.answer(f"по промокоду {message.text} можно продлить профиль на {promo["months"]} месяц за {promo["price"]} рублей", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],

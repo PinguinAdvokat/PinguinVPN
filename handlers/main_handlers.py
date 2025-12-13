@@ -184,7 +184,7 @@ async def promo_state(message:Message, state:FSMContext):
             await message.answer(f'ваш профиль продлён на {promo["months"]} месяц', reply_markup=back_keyboard)
         else:
             url = create_payment(message.chat.id, promo["months"], promo["price"], promo=message.text)
-            await message.answer(f"по промокоду {message.text} можно продлить профиль на {promo["months"]} месяц за {promo["price"]} рублей", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],
+            await message.answer(f'по промокоду {message.text} можно продлить профиль на {promo["months"]} месяц за {promo["price"]} рублей', reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Оплатить", url=url)],
                                                                                                                                                                                [InlineKeyboardButton(text="Назад", callback_data="menu")]]))
     else:
         await message.answer("промокод не найден")

@@ -31,7 +31,7 @@ async def get_yoomoney_history(token):
     async with ClientSession() as session:
         url = "https://yoomoney.ru/api/operation-history"
         params = {}
-        async with session.get(url=url, params=params, headers={'Authorization': token}) as response:
+        async with session.get(url=url, params=params, headers={'Authorization': YOOMONEY_TOKEN}) as response:
             js = await response.json()
             print(js)
             return js['operations']

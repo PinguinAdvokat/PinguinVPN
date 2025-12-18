@@ -31,8 +31,7 @@ async def update_clients(bot: Bot):
 async def get_yoomoney_history(token):
     async with ClientSession() as session:
         url = "https://yoomoney.ru/api/operation-history"
-        params = {}
-        async with session.post(url=url, params=params, headers={'Authorization': token}) as response:
+        async with session.post(url=url, headers={'Authorization': f'Bearer {token}'}, ) as response:
             if response.status == 200:
                 js = await response.json()
                 print(js)

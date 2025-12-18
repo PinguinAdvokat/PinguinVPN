@@ -37,5 +37,6 @@ async def get_yoomoney_history(token):
                 js = await response.json()
                 print(js)
                 return js['operations']
+            print(await response.json())
             print(await response.text())
             raise ClientConnectionError()

@@ -11,7 +11,7 @@ async def update_clients(bot: Bot):
     try:
         print('getting pay history...')
         history = await get_yoomoney_history(YOOMONEY_TOKEN)
-        print('history:', history)
+        print('done')
     except Exception as e:
         print('error get history: ', e)
         return

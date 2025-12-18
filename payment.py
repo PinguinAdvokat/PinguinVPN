@@ -17,12 +17,15 @@ async def update_clients(bot: Bot):
         return
     if len(bd_history) != 0:
         for i in range(len(history)):
-            if (not (history[i]['operation_id'], history[i]['label']) in bd_history) and history[i]['label']:
-                js = json.loads(str(history[i]['label']).replace("'", '"'))
-                storage.remove_promo(js["pr"], js["chat_id"])
-                await storage.extend_user(js["chat_id"], int(js["months"]) * 30)
-                storage.add_operations_history(history[i]['operation_id'], history[i]['label'])
-                await bot.send_message(js["chat_id"], f'Тариф успешно продлен на {js["months"]} месяц(ов), приятного пользования !\n(По всем вопросам обращайтесь в поддержку)')
+            try:
+                if (not (history[i]['operation_id'], history[i]['label']) in bd_history) and history[i]['label']:
+                    js = json.loads(str(history[i]['label']).replace("'", '"'))
+                    storage.remove_promo(js["pr"], js["chat_id"])
+                    await storage.extend_user(js["chat_id"], int(js["months"]) * 30)
+                    storage.add_operations_history(history[i]['operation_id'], history[i]['label'])
+                    await bot.send_message(js["chat_id"], f'Тариф успешно продлен на {js["months"]} месяц(ов), приятного пользования !\n(По всем вопросам обращайтесь в поддержку)')
+            except KeyError:
+                pass
     else:
         for i in range(len(history)):
             storage.add_operations_history(history[i]['operation_id'], history[i]['label'])

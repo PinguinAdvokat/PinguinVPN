@@ -33,4 +33,5 @@ async def get_yoomoney_history(token):
         params = {}
         async with session.get(url=url, params=params, headers={'Authorization': token}) as response:
             js = await response.json()
+            print(js)
             return js['operations']

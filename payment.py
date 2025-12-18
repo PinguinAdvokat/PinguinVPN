@@ -8,12 +8,12 @@ from config import YOOMONEY_TOKEN
 
 async def update_clients(bot: Bot):
     bd_history = storage.get_operations_history()
-    #try:
-    print('getting pay history...')
-    history = await get_yoomoney_history(YOOMONEY_TOKEN)
-    print('history:', history)
-    #except Exception as e:
-        #print('error get history: ', e)
+    try:
+        print('getting pay history...')
+        history = await get_yoomoney_history(YOOMONEY_TOKEN)
+        print('history:', history)
+    except Exception as e:
+        print('error get history: ', e)
     if len(bd_history) != 0:
         for i in range(len(history)):
             if (not (history[i].operation_id, history[i].label) in bd_history) and history[i].label:
@@ -32,9 +32,8 @@ async def get_yoomoney_history(token):
         url = "https://yoomoney.ru/api/operation-history"
         params = {}
         async with session.get(url=url, params=params, headers={'Authorization': token}) as response:
-            print(response.status)
-            if response.status != 200:
+            if response.status == 200:
                 js = await response.json()
                 print(js)
                 return js['operations']
-            raise ClientConnectionError(response.status)
+            raise ClientConnectionError(await response.text())

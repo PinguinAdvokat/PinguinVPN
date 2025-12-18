@@ -17,7 +17,7 @@ async def update_clients(bot: Bot):
         return
     if len(bd_history) != 0:
         for i in range(len(history)):
-            if (not (history[i].operation_id, history[i].label) in bd_history) and history[i].label:
+            if (not (history[i]['operation_id'], history[i]['label']) in bd_history) and history[i]['label']:
                 js = json.loads(history[i].label)
                 storage.remove_promo(js["pr"], js["chat_id"])
                 await storage.extend_user(js["chat_id"], int(js["months"]) * 30)
@@ -34,7 +34,6 @@ async def get_yoomoney_history(token):
         async with session.post(url=url, headers={'Authorization': f'Bearer {token}'}, ) as response:
             if response.status == 200:
                 js = await response.json()
-                print(js)
                 return js['operations']
             print('status: ', response.status)
             print('json: ', await response.json())

@@ -8,8 +8,11 @@ from config import YOOMONEY_TOKEN
 async def update_clients(bot: Bot):
     bd_history = storage.get_operations_history()
     try:
+        print('getting pay history...')
         history = await get_yoomoney_history(YOOMONEY_TOKEN)
-    except:
+        print('history:', history)
+    except Exception as e:
+        print('error get history: ', e)
         return
     if len(bd_history) != 0:
         for i in range(len(history)):

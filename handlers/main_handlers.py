@@ -191,7 +191,7 @@ async def promo_state(message:Message, state:FSMContext):
 
 @ro.message(Support.report_text)
 async def report(message:Message, state:FSMContext):
-    await message.bot.send_message(INFO_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username}")
+    await message.bot.send_message(INFO_CHAT_ID, f"Получена жалоба от пользователя {message.from_user.username} chat_id: {message.chat.id}")
     await message.send_copy(INFO_CHAT_ID)
     await state.clear()
     await message.answer("сообщение успешно отправлено поддержке")

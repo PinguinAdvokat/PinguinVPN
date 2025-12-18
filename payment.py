@@ -14,6 +14,7 @@ async def update_clients(bot: Bot):
         print('history:', history)
     except Exception as e:
         print('error get history: ', e)
+        return
     if len(bd_history) != 0:
         for i in range(len(history)):
             if (not (history[i].operation_id, history[i].label) in bd_history) and history[i].label:
@@ -36,4 +37,5 @@ async def get_yoomoney_history(token):
                 js = await response.json()
                 print(js)
                 return js['operations']
-            raise ClientConnectionError(await response.text())
+            print(await response.text())
+            raise ClientConnectionError()

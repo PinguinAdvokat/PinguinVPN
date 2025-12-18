@@ -18,7 +18,7 @@ async def update_clients(bot: Bot):
     if len(bd_history) != 0:
         for i in range(len(history)):
             if (not (history[i]['operation_id'], history[i]['label']) in bd_history) and history[i]['label']:
-                js = json.loads(history[i]['label'])
+                js = json.loads('"' + history[i]['label'] + '"')
                 storage.remove_promo(js["pr"], js["chat_id"])
                 await storage.extend_user(js["chat_id"], int(js["months"]) * 30)
                 storage.add_operations_history(history[i]['operation_id'], history[i]['label'])
